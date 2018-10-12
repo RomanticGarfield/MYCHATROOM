@@ -14,8 +14,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
@@ -30,7 +28,7 @@ int serve_user_register(send_t *precv); // 注册函数
 
 int serve_user_login(send_t *precv);  // 登录函数
 
-int serve_user_logof(send_t *precv);  // 下线函数
+int serve_user_logoff(send_t *precv);  // 下线函数
 
 int serve_user_update(send_t *precv); // 修改基本信息
 

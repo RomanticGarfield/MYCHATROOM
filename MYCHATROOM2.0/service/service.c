@@ -29,7 +29,7 @@ int *service(send_t *precv){
 			serve_user_logoff(precv);
 			break;
 
-		// 更新
+		// 修改基本信息
 		case _USERUPD:
 			
 			serve_user_update(precv);
@@ -54,33 +54,19 @@ int *service(send_t *precv){
 			serve_friend_find(precv);
 			break;
 
-
-		/* case _UPLOAD:
-
-			file_upload(precv);
-			break;
-
-		case _DOWNLOAD:
-			
-			file_download(precv);
-			break;
-
-		case _FRIENDSEND:
-			
-			serve_friend_send(precv);
-			break;
-
-		case _FRIENDFIND:
-			
-			serve_friend_find(precv);
-			break; */
+		// 私聊
 		case _CHATONE:
 			
 			serve_chat_one(precv);
 			break;
-			/*
-			 *
-			 * */
+
+		// 群聊
+		case _CHATGROUP:
+
+			serve_chat_group(precv);
+			break;
+
+
 		default:
 			break;
 

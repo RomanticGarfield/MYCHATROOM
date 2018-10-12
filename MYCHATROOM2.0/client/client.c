@@ -1,54 +1,66 @@
-/*******************************************************************************
- ** Author :          Cooon
- ** Email :           Cocoon0206@163.com
- ** Last modified :   2018-09-01 08:54
- ** Filename :        client.c
- ** Description :	  客户端主程序
- ******************************************************************************/
+//  Author :          Cooon
+//  Email :           Cocoon0206@163.com
+//  Last modified :   2018-09-01 08:54
+//  Filename :        client.c
+//  Description :	  客户端主程序
 
 #include "client.h"
 
 //登录界面
 int login_ui(int conn_fd){
 
-	int i = 0;
 	char c = 0;
+	int result_login = 0;
+	int times_false = 0;
 	send_t send_buf,recv_buf;
 	send_t *psend = &send_buf;
 	send_t *precv = &recv_buf;
-	
-	system("clear");
-	printf("\033[31m<system> \033[0m:\033[33m welcome \033[0m, log in please\n");
-	
-	//用户名输入
-	printf("username:"); 
-	get_username(32, psend->userinfo.username);	
-	//密码输入
-	printf("password:");
-	get_userpasswd(32, psend->userinfo.userpasswd);
-	//请求登录
-	psend->command_type = _USERONL;
-	psend->conn_fd = conn_fd;
-	send_data(psend->conn_fd, psend);
 
-	recv_data(conn_fd, precv);//获取服务器响应
+	do{	
+    	system("clear");
+    	printlogo();
+    	printf("\033[31m<system> \033[0m:\033[33m welcome \033[0m, log in please\n");
+    	
+    	//用户名输入
+    	printf("username:"); 
+    	get_username(32, psend->userinfo.username);	
+    	//密码输入
+    	printf("password:");
+    	get_userpasswd(32, psend->userinfo.userpasswd);
+    	//请求登录
+    	psend->command_type = _USERONL;
+    	psend->conn_fd = conn_fd;
+    	send_data(psend->conn_fd, psend);
+    
+    	recv_data(conn_fd, precv);//获取服务器响应
+    
+    	if(precv->userstatus == VALID_USERINFO){
+    		//登录信息正确，登录成功
+    		result_login = 1;
+    		puts("Sign in sucess...\n");
+    	}
+    	else if(precv->userstatus == INVALID_USERINFO){
+    		//信息不正确，登录失败
+    		if(precv->input_check == _FALSENAME){
+    			puts("name not exist.");
+    		}
+    		else if(precv->input_check == _FALSEPASSWD){
+    			puts("wrong password.");
+    		}
+    		else if(precv->input_check == _ONLINE){
+    			puts("user already signed in.");
+    		}
+			if(times_false++ == 3){//错误超过三次
+				puts("the times of false input is out of permission");
+				puts("the program will exit 1s later");
+				sleep(1);
+				exit(0);
+			}else{
+				puts("you have %d times chances left", 3-times_false);
+			}
 
-	if(precv->userstatus == VALID_USERINFO){
-		//登录信息正确，登录成功
-		puts("Sign in sucess...\n");
-	}
-	else if(precv->userstatus == INVALID_USERINFO){
-		//信息不正确，登录失败
-		if(precv->input_check == _FALSENAME){
-			puts("name not exist.");
-		}
-		else if(precv->input_check == _FALSEPASSWD){
-			puts("wrong password.");
-		}
-		else if(precv->input_check == _ONLINE){
-			puts("user already signed in.");
-		}
-	}
+    	}
+	}while(login_result);
 	sleep(1);
 }
 
@@ -86,40 +98,46 @@ int register_ui(int conn_fd){
 		puts("register failed");
 		return 0;
 	}
+	else if(precv->user_status == VALID_USERINFO){
+		//注册成功
+		puts(“register success”);
+		puts("logining...");
+	}
 	sleep(1);
-	return 1;
 }
 
 
 //初始化界面
 void init_ui(int conn_fd){
 	char choice;
-	do{
-		//
-		system("clear");
-		puts("\033[33m welcome ,what do you want?\033[0m");
-		puts("Sign in");
-		puts("Register");
-		puts("Exit");
-		puts("");
-
-		scanf("%c",&choice);
-		  
-		switch(choice){
-			case 'S':
-			case 's':
-				login_ui(conn_fd);
-				break;
-
-			case 'r':
-			case 'R':
-				register_ui(conn_fd);
-				break;
-		
-		}
-		puts("\033[33m.-.-.-.-.-.-.-.-\033[0m");
 	
-	}while(choice != 'E' && choice != 'e')
+	//
+	system("clear");
+	puts("\033[33m welcome ,please choose:\033[0m");
+	puts("Sign in");
+	puts("Register");
+	puts("Exit");
+	puts("");
+
+	scanf("%c",&choice);
+	  
+	switch(choice){
+		case 'S':
+		case 's':
+			login_ui(conn_fd);
+			break;
+
+		case 'r':
+		case 'R':
+			register_ui(conn_fd);
+			break;
+
+		case 'e':
+		case 'E':
+			exit(0);
+			break;
+	}
+	puts("\033[33m.-.-.-.-.-.-.-.-.-.-.-.-\033[0m");
 	
 }
 
